@@ -10,7 +10,7 @@
 --
 
 --  Basalt.Queue is a generic fifo queue implementation. It can use elements
---  of any non-limited type.
+--  of any definite non-limited type.
 
 generic
    type T is private;

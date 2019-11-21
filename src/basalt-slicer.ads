@@ -51,7 +51,7 @@ is
    --  Get the current slice
    --
    --  @param C  Context
-   --  @return   The current slice that is selected
+   --  @return   The current slice
    function Get_Slice (C : Context) return Slice with
       Post => Get_Slice'Result.Last - Get_Slice'Result.First < Get_Length (C)
               and then Get_Slice'Result.First in Get_Range (C).First .. Get_Range (C).Last
