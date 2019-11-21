@@ -13,4 +13,13 @@ library project Basalt is
    for Library_Dir use "lib";
    for Library_Kind use Kind;
 
+   package Compiler is
+      case Kind is
+         when "dynamic" =>
+            null;
+         when "static" =>
+            for Default_Switches ("Ada") use ("-fPIC");
+      end case;
+   end Compiler;
+
 end Basalt;
