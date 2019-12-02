@@ -17,21 +17,21 @@ is
    -- Size --
    ----------
 
-   function Size (S : Stack_Type) return Positive is
+   function Size (S : Context) return Positive is
      (S.List'Last);
 
    -----------
    -- Count --
    -----------
 
-   function Count (S : Stack_Type) return Natural is
+   function Count (S : Context) return Natural is
      (S.Index);
 
    ----------
    -- Push --
    ----------
 
-   procedure Push (S : in out Stack_Type;
+   procedure Push (S : in out Context;
                    E :        Element_Type) is
    begin
       S.Index := S.Index + 1;
@@ -42,7 +42,7 @@ is
    -- Pop --
    ---------
 
-   procedure Pop (S : in out Stack_Type;
+   procedure Pop (S : in out Context;
                   E :    out Element_Type) is
    begin
       E := S.List (S.Index);
@@ -53,7 +53,7 @@ is
    -- Drop --
    ----------
 
-   procedure Drop (S : in out Stack_Type) is
+   procedure Drop (S : in out Context) is
    begin
       S.Index := S.Index - 1;
    end Drop;
@@ -62,7 +62,7 @@ is
    -- Reset --
    -----------
 
-   procedure Reset (S : in out Stack_Type) is
+   procedure Reset (S : in out Context) is
    begin
       S.Index := 0;
    end Reset;
@@ -71,7 +71,7 @@ is
    -- Initialize --
    ----------------
 
-   procedure Initialize (S            : out Stack_Type;
+   procedure Initialize (S            : out Context;
                          Null_Element :     Element_Type)
    is
    begin

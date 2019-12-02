@@ -6,7 +6,7 @@ package body Proof_Stack with
 is
 
    package Stack is new Basalt.Stack (Integer);
-   S : Stack.Stack_Type (10);
+   S : Stack.Context (10);
 
    procedure Prove
    is

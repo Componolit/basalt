@@ -8,7 +8,7 @@ is
    procedure Test_Stack (T : in out Aunit.Test_Cases.Test_Case'Class)
    is
       pragma Unreferenced (T);
-      Q : F.Stack_Type (100);
+      Q : F.Context (100);
       J : Integer;
    begin
       F.Initialize (Q, 0);
@@ -24,7 +24,7 @@ is
    procedure Test_Full_Empty (T : in out Aunit.Test_Cases.Test_Case'Class)
    is
       pragma Unreferenced (T);
-      Q : F.Stack_Type (2);
+      Q : F.Context (2);
    begin
       F.Initialize (Q, 0);
       Aunit.Assertions.Assert (F.Count (Q) = 0, "Count not 0");
@@ -41,8 +41,7 @@ is
    procedure Test_Single_Element (T : in out Aunit.Test_Cases.Test_Case'Class)
    is
       pragma Unreferenced (T);
-      Q : F.Stack_Type (1);
-      J : Integer;
+      Q : F.Context (1);
    begin
       F.Initialize (Q, 0);
       Aunit.Assertions.Assert (F.Is_Empty (Q), "Stack not empty");
@@ -58,7 +57,7 @@ is
    procedure Test_Count (T : in out Aunit.Test_Cases.Test_Case'Class)
    is
       pragma Unreferenced (T);
-      Q : F.Stack_Type (100);
+      Q : F.Context (100);
    begin
       F.Initialize (Q, 0);
       Aunit.Assertions.Assert (F.Count (Q) = 0, "Count should be 0");
@@ -87,10 +86,10 @@ is
    procedure Test_Size (T : in out Aunit.Test_Cases.Test_Case'Class)
    is
       pragma Unreferenced (T);
-      Q1 : F.Stack_Type (1);
-      Q2 : F.Stack_Type (50);
-      Q3 : F.Stack_Type (200);
-      Q4 : F.Stack_Type (13000);
+      Q1 : F.Context (1);
+      Q2 : F.Context (50);
+      Q3 : F.Context (200);
+      Q4 : F.Context (13000);
    begin
       F.Initialize (Q1, 0);
       F.Initialize (Q2, 0);
