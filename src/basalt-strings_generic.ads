@@ -10,7 +10,8 @@
 --
 
 package Basalt.Strings_Generic with
-   SPARK_Mode
+   SPARK_Mode,
+   Pure
 is
 
    type Base is new Integer range 2 .. 16;

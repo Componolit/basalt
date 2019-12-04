@@ -15,7 +15,8 @@
 generic
    type T is private;
 package Basalt.Queue with
-   SPARK_Mode
+   SPARK_Mode,
+   Pure
 is
 
    --  Queue storage type

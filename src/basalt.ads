@@ -9,6 +9,9 @@
 --  GNU Affero General Public License version 3.
 --
 
-package Basalt is
+package Basalt with
+   SPARK_Mode,
+   Pure
+is
 
 end Basalt;
