@@ -49,6 +49,15 @@ is
       end if;
    end Image_Ranged;
 
+   procedure Lemma_U64_Le16 (B : Base) with
+     Ghost,
+     Post => SI.Unsigned_64 (B) <= 16;
+
+   procedure Lemma_U64_Le16 (B : Base) is
+   begin
+      null;
+   end Lemma_U64_Le16;
+
    function Image_Modular (V : U;
                            B : Base    := 10;
                            C : Boolean := True) return String
@@ -57,8 +66,9 @@ is
       T     : SI.Unsigned_64                := SI.Unsigned_64 (V);
    begin
       for I in reverse Image'First .. Image'Last loop
+         Lemma_U64_Le16 (B);
          Image (I) := Digit (SI.Unsigned_8 (T rem SI.Unsigned_64 (B)), C);
-         T       := T / SI.Unsigned_64 (B);
+         T         := T / SI.Unsigned_64 (B);
          if T = 0 then
             return
                R : constant String (1 .. Image'Last - I + 1) := Image (I .. Image'Last)

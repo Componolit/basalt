@@ -16,7 +16,8 @@ package Basalt.Strings_Generic with
 is
 
    type Base is new Integer range 2 .. 16;
-   type Base_Size is array (Base'Range) of Positive;
+   subtype Base_Value is Positive range 16 .. 64;
+   type Base_Size is array (Base'Range) of Base_Value;
    Base_Length : constant Base_Size := (2  => 64,
                                         3  => 41,
                                         4  => 32,
