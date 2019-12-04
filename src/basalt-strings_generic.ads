@@ -11,7 +11,8 @@
 
 package Basalt.Strings_Generic with
    SPARK_Mode,
-   Pure
+   Pure,
+   Annotate => (GNATprove, Terminating)
 is
 
    type Base is new Integer range 2 .. 16;
