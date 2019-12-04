@@ -26,28 +26,28 @@ is
    --  large type T or large queue sizes.
    --
    --  @param Size  Length of the queue
-   type Queue (Size : Positive) is private;
+   type Context (Size : Positive) is private;
 
    --  Checks if a queue is valid, proof only
    --
-   --  @param Q  Queue
-   --  @return   Q is valid
-   function Valid (Q : Queue) return Boolean with
+   --  @param C  Queue context
+   --  @return   C is valid
+   function Valid (C : Context) return Boolean with
       Ghost;
 
    --  Returns the size of the queue given when instantiated
    --
-   --  @param Q  Queue
+   --  @param C  Queue context
    --  @return   Number of Elements the queue can hold
-   function Size (Q : Queue) return Positive with
-      Pre => Valid (Q);
+   function Size (C : Context) return Positive with
+      Pre => Valid (C);
 
    --  Returns the current length of the queue
    --
-   --  @param Q  Queue
+   --  @param C  Queue context
    --  @return   Number of elements currently in the queue
-   function Count (Q : Queue) return Natural with
-      Pre => Valid (Q);
+   function Count (C : Context) return Natural with
+      Pre => Valid (C);
 
    --  Initializes the queue with a default element value
    --
@@ -55,45 +55,45 @@ is
    --  the only way to assign a Queue object. The object will automatically
    --  be initialized with the given element. The initialized queue will be empty.
    --
-   --  @param Q             Queue
+   --  @param C             Queue context
    --  @param Null_Element  Default element to initialize the queue with
-   procedure Initialize (Q            : out Queue;
+   procedure Initialize (C            : out Context;
                          Null_Element :     T) with
-      Post => Valid (Q) and then Count (Q) = 0;
+      Post => Valid (C) and then Count (C) = 0;
 
    --  Puts an element in the queue.
    --
-   --  @param Q        Queue
+   --  @param C        Queue context
    --  @param Element  Element
-   procedure Put (Q       : in out Queue;
+   procedure Put (C       : in out Context;
                   Element :        T) with
-      Pre  => Valid (Q) and then Count (Q) < Size (Q),
-      Post => Valid (Q) and then Count (Q) = Count (Q'Old) + 1;
+      Pre  => Valid (C) and then Count (C) < Size (C),
+      Post => Valid (C) and then Count (C) = Count (C'Old) + 1;
 
    --  Check the current first element, does not alter the queue
    --
-   --  @param Q        Queue
+   --  @param C        Queue context
    --  @param Element  Head of the queue
-   procedure Peek (Q       :     Queue;
+   procedure Peek (C       :     Context;
                    Element : out T) with
-      Pre => Valid (Q) and then Count (Q) > 0;
+      Pre => Valid (C) and then Count (C) > 0;
 
    --  Drop the current first element
    --
-   --  @param Q  Queue
-   procedure Drop (Q : in out Queue) with
-      Pre  => Valid (Q) and then Count (Q) > 0,
-      Post => Valid (Q) and then Count (Q) = Count (Q'Old) - 1;
+   --  @param C  Queue context
+   procedure Drop (C : in out Context) with
+      Pre  => Valid (C) and then Count (C) > 0,
+      Post => Valid (C) and then Count (C) = Count (C'Old) - 1;
 
    --  Get the first element of the queue and drop it,
    --  equivalent to subsequent calls to Peek and Drop
    --
-   --  @param Q        Queue
+   --  @param C        Queue context
    --  @param Element  First element of the queue, will be dropped
-   procedure Pop (Q       : in out Queue;
+   procedure Pop (C       : in out Context;
                   Element :    out T) with
-      Pre  => Valid (Q) and then Count (Q) > 0,
-      Post => Valid (Q) and then Count (Q) = Count (Q'Old) - 1;
+      Pre  => Valid (C) and then Count (C) > 0,
+      Post => Valid (C) and then Count (C) = Count (C'Old) - 1;
 
 private
 
@@ -101,7 +101,7 @@ private
    subtype Long_Natural is Long_Integer range 0 .. Long_Integer'Last;
    subtype Long_Positive is Long_Integer range 1 .. Long_Integer'Last;
 
-   type Queue (Size : Positive) is record
+   type Context (Size : Positive) is record
       Index  : Long_Natural;
       Length : Long_Natural;
       List   : Simple_List (1 .. Size);

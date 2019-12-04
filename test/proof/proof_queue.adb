@@ -6,7 +6,7 @@ package body Proof_Queue with
 is
 
    package Fifo is new Basalt.Queue (Integer);
-   Queue : Fifo.Queue (10);
+   Queue : Fifo.Context (10);
 
    procedure Prove
    is
