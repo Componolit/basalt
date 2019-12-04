@@ -13,7 +13,8 @@ generic
    type Element_Type is private;
 package Basalt.Stack with
    SPARK_Mode,
-   Pure
+   Pure,
+   Annotate => (GNATprove, Terminating)
 is
    pragma Unevaluated_Use_Of_Old (Allow);
 
