@@ -11,7 +11,9 @@
 
 generic
    type Element_Type is private;
-package Basalt.Stack
+package Basalt.Stack with
+   SPARK_Mode,
+   Pure
 is
    pragma Unevaluated_Use_Of_Old (Allow);
 

@@ -13,7 +13,8 @@ with Interfaces;
 with Basalt.Strings_Generic;
 
 package Basalt.Strings with
-   SPARK_Mode
+   SPARK_Mode,
+   Pure
 is
 
    --  Image instances for the most common ranged and modular types

@@ -18,7 +18,8 @@
 generic
    type Index is range <>;
 package Basalt.Slicer with
-   SPARK_Mode
+   SPARK_Mode,
+   Pure
 is
 
    --  Slicer context
