@@ -10,7 +10,7 @@ is
 
    procedure Prove
    is
-      J : Integer;
+      J_Ignore : Integer;
    begin
       Fifo.Initialize (Queue, 0);
       for I in Integer range 7 .. 13 loop
@@ -19,7 +19,7 @@ is
       end loop;
       pragma Assert (Fifo.Count (Queue) = 7);
       for I in Integer range 1 .. 7 loop
-         Fifo.Pop (Queue, J);
+         Fifo.Pop (Queue, J_Ignore);
       end loop;
    end Prove;
 
