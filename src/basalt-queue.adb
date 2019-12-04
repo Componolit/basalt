@@ -13,13 +13,6 @@ package body Basalt.Queue with
    SPARK_Mode
 is
 
-   function Valid (C : Context) return Boolean is
-      (Long_Natural'Last - C.Index > Long_Positive (C.List'First)
-       and then C.Index + Long_Positive (C.List'First) in
-             Long_Positive (C.List'First) .. Long_Positive (C.List'Last)
-       and then Long_Positive'Last - Long_Positive (C.List'Length) >= C.Index
-       and then C.Length <= C.List'Length);
-
    function Size (C : Context) return Positive is (C.List'Length);
 
    function Count (C : Context) return Natural is (Natural (C.Length));
@@ -28,9 +21,15 @@ is
                          Null_Element :     T)
    is
    begin
-      C.List   := (C.List'Range => Null_Element);
-      C.Index  := Long_Natural'First;
+      --  This would be the correct way to initialize S.List:
+      --     C.List  := (others => Null_Element);
+      --  As this creates a (potentially large) object on the stack, we initialize in a loop. The resulting flow
+      --  error is justified in the spec.
+      for E of C.List loop
+         E := Null_Element;
+      end loop;
       C.Length := Long_Natural'First;
+      C.Index  := Long_Natural'First;
    end Initialize;
 
    procedure Put (C       : in out Context;

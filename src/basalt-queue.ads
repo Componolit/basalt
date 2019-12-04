@@ -29,26 +29,17 @@ is
    --  @param Size  Length of the queue
    type Context (Size : Positive) is private;
 
-   --  Checks if a queue is valid, proof only
-   --
-   --  @param C  Queue context
-   --  @return   C is valid
-   function Valid (C : Context) return Boolean with
-      Ghost;
-
    --  Returns the size of the queue given when instantiated
    --
    --  @param C  Queue context
    --  @return   Number of Elements the queue can hold
-   function Size (C : Context) return Positive with
-      Pre => Valid (C);
+   function Size (C : Context) return Positive;
 
    --  Returns the current length of the queue
    --
    --  @param C  Queue context
    --  @return   Number of elements currently in the queue
-   function Count (C : Context) return Natural with
-      Pre => Valid (C);
+   function Count (C : Context) return Natural;
 
    --  Initializes the queue with a default element value
    --
@@ -60,7 +51,10 @@ is
    --  @param Null_Element  Default element to initialize the queue with
    procedure Initialize (C            : out Context;
                          Null_Element :     T) with
-      Post => Valid (C) and then Count (C) = 0;
+      Post => Count (C) = 0;
+   pragma Annotate (GNATprove, False_Positive,
+                    """C.List"" might not be initialized*",
+                    "Initialized in complete loop");
 
    --  Puts an element in the queue.
    --
@@ -68,8 +62,8 @@ is
    --  @param Element  Element
    procedure Put (C       : in out Context;
                   Element :        T) with
-      Pre  => Valid (C) and then Count (C) < Size (C),
-      Post => Valid (C) and then Count (C) = Count (C'Old) + 1;
+      Pre  => Count (C) < Size (C),
+      Post => Count (C) = Count (C'Old) + 1;
 
    --  Check the current first element, does not alter the queue
    --
@@ -77,14 +71,14 @@ is
    --  @param Element  Head of the queue
    procedure Peek (C       :     Context;
                    Element : out T) with
-      Pre => Valid (C) and then Count (C) > 0;
+      Pre => Count (C) > 0;
 
    --  Drop the current first element
    --
    --  @param C  Queue context
    procedure Drop (C : in out Context) with
-      Pre  => Valid (C) and then Count (C) > 0,
-      Post => Valid (C) and then Count (C) = Count (C'Old) - 1;
+      Pre  => Count (C) > 0,
+      Post => Count (C) = Count (C'Old) - 1;
 
    --  Get the first element of the queue and drop it,
    --  equivalent to subsequent calls to Peek and Drop
@@ -93,8 +87,8 @@ is
    --  @param Element  First element of the queue, will be dropped
    procedure Pop (C       : in out Context;
                   Element :    out T) with
-      Pre  => Valid (C) and then Count (C) > 0,
-      Post => Valid (C) and then Count (C) = Count (C'Old) - 1;
+      Pre  => Count (C) > 0,
+      Post => Count (C) = Count (C'Old) - 1;
 
 private
 
@@ -103,9 +97,14 @@ private
    subtype Long_Positive is Long_Integer range 1 .. Long_Integer'Last;
 
    type Context (Size : Positive) is record
-      Index  : Long_Natural;
-      Length : Long_Natural;
+      Index  : Long_Natural := Long_Natural'First;
+      Length : Long_Natural := Long_Natural'First;
       List   : Simple_List (1 .. Size);
-   end record;
+   end record with
+      Dynamic_Predicate => Long_Natural'Last - Context.Index > Long_Positive (Context.List'First)
+                           and then Context.Index + Long_Positive (Context.List'First) in
+                              Long_Positive (Context.List'First) .. Long_Positive (Context.List'Last)
+                           and then Long_Positive'Last - Long_Positive (Context.List'Length) >= Context.Index
+                           and then Context.Length <= Context.List'Length;
 
 end Basalt.Queue;
