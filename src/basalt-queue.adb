@@ -13,57 +13,57 @@ package body Basalt.Queue with
    SPARK_Mode
 is
 
-   function Valid (Q : Queue) return Boolean is
-      (Long_Natural'Last - Q.Index > Long_Positive (Q.List'First)
-       and then Q.Index + Long_Positive (Q.List'First) in
-             Long_Positive (Q.List'First) .. Long_Positive (Q.List'Last)
-       and then Long_Positive'Last - Long_Positive (Q.List'Length) >= Q.Index
-       and then Q.Length <= Q.List'Length);
+   function Valid (C : Context) return Boolean is
+      (Long_Natural'Last - C.Index > Long_Positive (C.List'First)
+       and then C.Index + Long_Positive (C.List'First) in
+             Long_Positive (C.List'First) .. Long_Positive (C.List'Last)
+       and then Long_Positive'Last - Long_Positive (C.List'Length) >= C.Index
+       and then C.Length <= C.List'Length);
 
-   function Size (Q : Queue) return Positive is (Q.List'Length);
+   function Size (C : Context) return Positive is (C.List'Length);
 
-   function Count (Q : Queue) return Natural is (Natural (Q.Length));
+   function Count (C : Context) return Natural is (Natural (C.Length));
 
-   procedure Initialize (Q            : out Queue;
+   procedure Initialize (C            : out Context;
                          Null_Element :     T)
    is
    begin
-      Q.List   := (Q.List'Range => Null_Element);
-      Q.Index  := Long_Natural'First;
-      Q.Length := Long_Natural'First;
+      C.List   := (C.List'Range => Null_Element);
+      C.Index  := Long_Natural'First;
+      C.Length := Long_Natural'First;
    end Initialize;
 
-   procedure Put (Q       : in out Queue;
+   procedure Put (C       : in out Context;
                   Element :        T)
    is
       Index : Positive;
    begin
-      Index          := Positive ((Q.Index + Q.Length) mod
-                                     Q.List'Length + Long_Positive (Q.List'First));
-      Q.Length       := Q.Length + 1;
-      Q.List (Index) := Element;
+      Index          := Positive ((C.Index + C.Length) mod
+                                     C.List'Length + Long_Positive (C.List'First));
+      C.Length       := C.Length + 1;
+      C.List (Index) := Element;
    end Put;
 
-   procedure Peek (Q       :     Queue;
+   procedure Peek (C       :     Context;
                    Element : out T)
    is
    begin
-      Element := Q.List (Positive (Q.Index + Long_Positive (Q.List'First)));
+      Element := C.List (Positive (C.Index + Long_Positive (C.List'First)));
    end Peek;
 
-   procedure Drop (Q : in out Queue)
+   procedure Drop (C : in out Context)
    is
    begin
-      Q.Index  := (Q.Index + 1) mod Q.List'Length;
-      Q.Length := Q.Length - 1;
+      C.Index  := (C.Index + 1) mod C.List'Length;
+      C.Length := C.Length - 1;
    end Drop;
 
-   procedure Pop (Q       : in out Queue;
+   procedure Pop (C       : in out Context;
                   Element :    out T)
    is
    begin
-      Peek (Q, Element);
-      Drop (Q);
+      Peek (C, Element);
+      Drop (C);
    end Pop;
 
 end Basalt.Queue;
