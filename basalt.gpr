@@ -22,4 +22,15 @@ library project Basalt is
       end case;
    end Compiler;
 
+   package Prove is
+      for Proof_Switches ("Ada") use (
+         "-j0",
+         "--prover=z3,cvc4",
+         "--steps=2000",
+         "--memlimit=1000",
+         "--checks-as-errors",
+         "--warnings=error"
+      );
+   end Prove;
+
 end Basalt;
