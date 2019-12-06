@@ -7,3 +7,6 @@ services:
 
 script:
     - docker run -v $PWD:/basalt -t jklmnn/componolit-ci:latest-gnat /bin/sh -c "gprbuild -P /basalt/test/aunit/test.gpr && /basalt/test/aunit/obj/test && gnatprove -P /basalt/test/proof/proof.gpr --level=2 --report=all --checks-as-errors"
+
+after_script:
+   - cat test/proof/obj/gnatprove/gnatprove.out
