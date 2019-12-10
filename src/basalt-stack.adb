@@ -38,6 +38,17 @@ is
       S.List (S.Index) := E;
    end Push;
 
+   ------------------
+   -- Generic_Push --
+   ------------------
+
+   procedure Generic_Push (S : in out Context)
+   is
+   begin
+      S.Index := S.Index + 1;
+      Push (S.List (S.Index));
+   end Generic_Push;
+
    ---------
    -- Pop --
    ---------
@@ -48,6 +59,17 @@ is
       E := S.List (S.Index);
       Drop (S);
    end Pop;
+
+   -----------------
+   -- Generic_Pop --
+   -----------------
+
+   procedure Generic_Pop (S : in out Context)
+   is
+   begin
+      Pop (S.List (S.Index));
+      Drop (S);
+   end Generic_Pop;
 
    ----------
    -- Drop --

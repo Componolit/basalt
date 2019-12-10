@@ -58,6 +58,16 @@ is
      Post => Count (S) = Count (S)'Old + 1
              and then not Is_Empty (S);
 
+   --  Push element onto stack
+   --
+   --  @param S  Stack
+   generic
+      with procedure Push (E : out Element_Type);
+   procedure Generic_Push (S : in out Context) with
+      Pre  => not Is_Full (S),
+      Post => Count (S) = Count (S)'Old + 1
+              and then not Is_Empty (S);
+
    --  Pop an element off the stack
    --
    --  @param S  Stack
@@ -67,6 +77,16 @@ is
      Pre  => not Is_Empty (S),
      Post => Count (S) = Count (S)'Old - 1
              and then not Is_Full (S);
+
+   --  Pop an element off the stack
+   --
+   --  @param S  Stack
+   generic
+      with procedure Pop (E : Element_Type);
+   procedure Generic_Pop (S : in out Context) with
+      Pre  => not Is_Empty (S),
+      Post => Count (S) = Count (S)'Old - 1
+              and then not Is_Full (S);
 
    --  Drop an element from stack
    --
