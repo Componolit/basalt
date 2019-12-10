@@ -17,6 +17,9 @@ is
 
    function Count (C : Context) return Natural is (Natural (C.Length));
 
+   function Put_Index (C : Context) return Positive is
+      (Positive ((C.Index + C.Length - 1) mod C.List'Length + Long_Positive (C.List'First)));
+
    procedure Initialize (C            : out Context;
                          Null_Element :     T)
    is
@@ -35,22 +38,16 @@ is
    procedure Put (C       : in out Context;
                   Element :        T)
    is
-      Index : constant Positive :=
-         Positive ((C.Index + C.Length)
-            mod C.List'Length + Long_Positive (C.List'First));
    begin
       C.Length       := C.Length + 1;
-      C.List (Index) := Element;
+      C.List (Put_Index (C)) := Element;
    end Put;
 
    procedure Generic_Put (C : in out Context)
    is
-      Index : constant Positive :=
-         Positive ((C.Index + C.Length)
-            mod C.List'Length + Long_Positive (C.List'First));
    begin
       C.Length       := C.Length + 1;
-      Put (C.List (Index));
+      Put (C.List (Put_Index (C)));
    end Generic_Put;
 
    procedure Peek (C       :     Context;
