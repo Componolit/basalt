@@ -84,6 +84,50 @@ is
       Aunit.Assertions.Assert (F.Count (Q) = 0, "Count should be 0");
    end Test_Count;
 
+   procedure Test_Peek (T : in out Aunit.Test_Cases.Test_Case'Class)
+   is
+      pragma Unreferenced (T);
+      Q      : F.Context (1);
+      Unused : Integer;
+   begin
+      F.Initialize (Q, 0);
+      Aunit.Assertions.Assert (F.Count (Q) = 0, "Count should be 0");
+      F.Put (Q, 1);
+      Aunit.Assertions.Assert (F.Count (Q) = 1, "Count should be 1");
+      F.Peek (Q, Unused);
+      Aunit.Assertions.Assert (F.Count (Q) = 1, "Count should be 1 after Peek");
+   end Test_Peek;
+
+   procedure Test_Generic (T : in out Aunit.Test_Cases.Test_Case'Class)
+   is
+      pragma Unreferenced (T);
+      procedure Put (I : out Integer);
+      procedure Peek (I : Integer);
+      Q : F.Context (1);
+      procedure Put is new F.Generic_Put (Put);
+      procedure Peek is new F.Generic_Peek (Peek);
+      procedure Pop is new F.Generic_Pop (Peek);
+      procedure Put (I : out Integer)
+      is
+      begin
+         I := 42;
+      end Put;
+      procedure Peek (I : Integer)
+      is
+      begin
+         Aunit.Assertions.Assert (I = 42, "I should be 42");
+      end Peek;
+   begin
+      F.Initialize (Q, 0);
+      Aunit.Assertions.Assert (F.Count (Q) = 0, "Count should be 0");
+      Put (Q);
+      Aunit.Assertions.Assert (F.Count (Q) = 1, "Count should be 1");
+      Peek (Q);
+      Aunit.Assertions.Assert (F.Count (Q) = 1, "Count should be 1 after Peek");
+      Pop (Q);
+      Aunit.Assertions.Assert (F.Count (Q) = 0, "Count should be 0");
+   end Test_Generic;
+
    procedure Test_Size (T : in out Aunit.Test_Cases.Test_Case'Class)
    is
       pragma Unreferenced (T);
@@ -135,6 +179,8 @@ is
       Register_Routine (T, Test_Overflow'Access, "Test overflow");
       Register_Routine (T, Test_Count'Access, "Test count");
       Register_Routine (T, Test_Size'Access, "Test size");
+      Register_Routine (T, Test_Peek'Access, "Test peek");
+      Register_Routine (T, Test_Generic'Access, "Test generic");
    end Register_Tests;
 
    function Name (T : Test_Case) return Aunit.Message_String

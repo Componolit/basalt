@@ -35,13 +35,23 @@ is
    procedure Put (C       : in out Context;
                   Element :        T)
    is
-      Index : Positive;
+      Index : constant Positive :=
+         Positive ((C.Index + C.Length)
+            mod C.List'Length + Long_Positive (C.List'First));
    begin
-      Index          := Positive ((C.Index + C.Length) mod
-                                     C.List'Length + Long_Positive (C.List'First));
       C.Length       := C.Length + 1;
       C.List (Index) := Element;
    end Put;
+
+   procedure Generic_Put (C : in out Context)
+   is
+      Index : constant Positive :=
+         Positive ((C.Index + C.Length)
+            mod C.List'Length + Long_Positive (C.List'First));
+   begin
+      C.Length       := C.Length + 1;
+      Put (C.List (Index));
+   end Generic_Put;
 
    procedure Peek (C       :     Context;
                    Element : out T)
@@ -49,6 +59,12 @@ is
    begin
       Element := C.List (Positive (C.Index + Long_Positive (C.List'First)));
    end Peek;
+
+   procedure Generic_Peek (C : Context)
+   is
+   begin
+      Peek (C.List (Positive (C.Index + Long_Positive (C.List'First))));
+   end Generic_Peek;
 
    procedure Drop (C : in out Context)
    is
@@ -64,5 +80,13 @@ is
       Peek (C, Element);
       Drop (C);
    end Pop;
+
+   procedure Generic_Pop (C : in out Context)
+   is
+      procedure Local_Peek is new Generic_Peek (Pop);
+   begin
+      Local_Peek (C);
+      Drop (C);
+   end Generic_Pop;
 
 end Basalt.Queue;

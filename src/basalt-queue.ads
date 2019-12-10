@@ -65,12 +65,29 @@ is
       Pre  => Count (C) < Size (C),
       Post => Count (C) = Count (C'Old) + 1;
 
+   --  Puts an element in the queue.
+   --
+   --  @param C  Queue context
+   generic
+      with procedure Put (Element : out T);
+   procedure Generic_Put (C : in out Context) with
+      Pre  => Count (C) < Size (C),
+      Post => Count (C) = Count (C'Old) + 1;
+
    --  Check the current first element, does not alter the queue
    --
    --  @param C        Queue context
    --  @param Element  Head of the queue
    procedure Peek (C       :     Context;
                    Element : out T) with
+      Pre => Count (C) > 0;
+
+   --  Check the current first element, does not alter the queue
+   --
+   --  @param C  Queue context
+   generic
+      with procedure Peek (Element : T);
+   procedure Generic_Peek (C : Context) with
       Pre => Count (C) > 0;
 
    --  Drop the current first element
@@ -87,6 +104,12 @@ is
    --  @param Element  First element of the queue, will be dropped
    procedure Pop (C       : in out Context;
                   Element :    out T) with
+      Pre  => Count (C) > 0,
+      Post => Count (C) = Count (C'Old) - 1;
+
+   generic
+      with procedure Pop (Element : T);
+   procedure Generic_Pop (C : in out Context) with
       Pre  => Count (C) > 0,
       Post => Count (C) = Count (C'Old) - 1;
 
