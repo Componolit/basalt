@@ -40,4 +40,9 @@ is
    function Image (V : Duration) return String with
       Post => Image'Result'Length <= 28 and Image'Result'First = 1;
 
+   package Value_U8 is new Strings_Generic.Value_Option_Modular (Interfaces.Unsigned_8);
+   package Value_U16 is new Strings_Generic.Value_Option_Modular (Interfaces.Unsigned_16);
+   package Value_U32 is new Strings_Generic.Value_Option_Modular (Interfaces.Unsigned_32);
+   package Value_U64 is new Strings_Generic.Value_Option_Modular (Interfaces.Unsigned_64);
+
 end Basalt.Strings;

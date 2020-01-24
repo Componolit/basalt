@@ -15,7 +15,8 @@ package Basalt.Strings_Generic with
    Annotate => (GNATprove, Terminating)
 is
 
-   type Base is new Integer range 2 .. 16;
+   type Residue_Class_Ring is new Integer range 0 .. 16;
+   subtype Base is Residue_Class_Ring range 2 .. 16;
    subtype Base_Value is Positive range 16 .. 64;
    type Base_Size is array (Base'Range) of Base_Value;
    Base_Length : constant Base_Size := (2  => 64,
@@ -33,6 +34,15 @@ is
                                         14 => 17,
                                         15 => 17,
                                         16 => 16);
+
+   subtype Residue is Residue_Class_Ring range 0 .. 15;
+   type Charset is array (Residue) of Character;
+   Lowercase : constant Charset := ('0', '1', '2', '3', '4', '5',
+                                    '6', '7', '8', '9',
+                                    'a', 'b', 'c', 'd', 'e', 'f');
+   Uppercase : constant Charset := ('0', '1', '2', '3', '4', '5',
+                                    '6', '7', '8', '9',
+                                    'A', 'B', 'C', 'D', 'E', 'F');
 
    --  Image function for ranged types
    --
@@ -59,5 +69,36 @@ is
                            B : Base    := 10;
                            C : Boolean := True) return String with
       Post => Image_Modular'Result'Length <= Base_Length (B) and Image_Modular'Result'First = 1;
+
+   generic
+      type T is private;
+   package Generic_Optional
+   is
+
+      type Optional (Valid : Boolean := False) is record
+         case Valid is
+            when True =>
+               Value : T;
+            when False =>
+               null;
+         end case;
+      end record;
+
+   end Generic_Optional;
+
+   generic
+      type T is mod <>;
+   package Value_Option_Modular
+   is
+
+      package Optional_Pac is new Generic_Optional (T);
+      subtype Optional is Optional_Pac.Optional;
+
+      function Value (S : String;
+                      B : Base) return Optional;
+
+      function Value (S : String) return Optional;
+
+   end Value_Option_Modular;
 
 end Basalt.Strings_Generic;
