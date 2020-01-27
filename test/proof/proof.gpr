@@ -1,10 +1,9 @@
-with "../../basalt.gpr";
 
 project Proof is
 
    for Create_Missing_Dirs use "True";
    for Object_Dir use "obj";
-   for Source_Dirs use (".");
+   for Source_Dirs use (".", "../../src");
 
    package Prove is
       for Proof_Switches ("Ada") use (
