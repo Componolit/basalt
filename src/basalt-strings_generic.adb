@@ -21,7 +21,8 @@ is
    generic
       type T is (<>);
    function Character_Value (C : Character) return T with
-      Pre => C in '0' .. '9' | 'a' .. 'f' | 'A' .. 'F';
+      Pre  => C in '0' .. '9' | 'a' .. 'f' | 'A' .. 'F',
+      Post => T'Pos (Character_Value'Result) >= 0;
 
    function Digit (U : SI.Unsigned_8;
                    C : Boolean) return Character
@@ -102,6 +103,53 @@ is
       end case;
    end Character_Value;
 
+   function Value_Base (S : String) return Base_Number
+   is
+      function Base_Val is new Character_Value (Residue_Class_Ring);
+      Ada_Base  : Residue_Class_Ring;
+      Base_Char : Residue_Class_Ring;
+   begin
+      if S (S'First .. S'First + 1) = "0x" then -- C base 16
+         return Base_Number'(Valid => True, N_Base => 16, First => S'First + 2, Last => S'Last);
+      elsif S (S'First .. S'First + 1) = "0o" then -- C base 8
+         return Base_Number'(Valid => True, N_Base => 8, First => S'First + 2, Last => S'Last);
+      elsif S (S'First .. S'First + 1) = "0b" then -- C base 2
+         return Base_Number'(Valid => True, N_Base => 2, First => S'First + 2, Last => S'Last);
+      elsif
+         (S (S'First + 1) = '#' or else S (S'First + 2) = '#')
+         and then S (S'Last) = '#'
+         and then S'Length > 3
+      then
+         if S (S'First) not in '0' .. '9' then
+            return Base_Number'(Valid => False);
+         end if;
+         Ada_Base := Base_Val (S (S'First));
+         case S (S'First + 1) is
+            when '0' .. '9' =>
+               if Ada_Base > 1 then
+                  return Base_Number'(Valid => False);
+               end if;
+               Base_Char := Base_Val (S (S'First + 1));
+               if Base_Char < 7 then
+                  Ada_Base := Ada_Base * 10 + Base_Char;
+               else
+                  return Base_Number'(Valid => False);
+               end if;
+            when '#' =>
+               if Ada_Base in Base'Range then
+                  return Base_Number'(Valid => True, N_Base => Ada_Base, First => S'First + 2, Last => S'Last - 1);
+               end if;
+               return Base_Number'(Valid => False);
+            when others =>
+               return Base_Number'(Valid => False);
+         end case;
+         if S (S'First + 2) = '#' and then Ada_Base in Base'Range then
+            return Base_Number'(Valid => True, N_Base => Ada_Base, First => S'First + 3, Last => S'Last - 1);
+         end if;
+      end if;
+      return Base_Number'(Valid => True, N_Base => 10, First => S'First, Last => S'Last);
+   end Value_Base;
+
    package body Value_Option_Modular
    is
       function Char_Value is new Character_Value (T);
@@ -109,76 +157,116 @@ is
       function Value (S : String;
                       B : Base) return Optional
       is
-         C_Val : T;
-         Val : T := 0;
+         C_Val      : T;
+         Val        : T       := 0;
+         Underscore : Boolean := True;
       begin
-         if S'Length < 1 then
+         if S'Length < 1 or else S (S'Last) = '_' then
             return Optional'(Valid => False);
          end if;
          for I in S'Range loop
-            if
-               S (I) not in '0' .. (if B <= 10 then Lowercase (Residue_Class_Ring (B) - 1) else '9')
-               and then (if B > 10 then S (I) not in 'a' .. Lowercase (Residue_Class_Ring (B) - 1)
-                                                   | 'A' .. Uppercase (Residue_Class_Ring (B) - 1))
-            then
-               return Optional'(Valid => False);
+            if S (I) = '_' and then not Underscore then
+               Underscore := True;
+            else
+               Underscore := False;
+               if
+                  S (I) not in '0' .. (if B <= 10 then Lowercase (Residue_Class_Ring (B) - 1) else '9')
+                  and then (if B > 10 then S (I) not in 'a' .. Lowercase (Residue_Class_Ring (B) - 1)
+                                                      | 'A' .. Uppercase (Residue_Class_Ring (B) - 1))
+               then
+                  return Optional'(Valid => False);
+               end if;
+               C_Val := Char_Value (S (I));
+               if Val > T'Last - C_Val then
+                  return Optional'(Valid => False);
+               end if;
+               Val := Val + C_Val;
+               exit when I = S'Last;
+               if Val > T'Last / T (B) then
+                  return Optional'(Valid => False);
+               end if;
+               Val := Val * T (B);
             end if;
-            C_Val := Char_Value (S (I));
-            if Val > T'Last - C_Val then
-               return Optional'(Valid => False);
-            end if;
-            Val := Val + C_Val;
-            exit when I = S'Last;
-            if Val > T'Last / T (B) then
-               return Optional'(Valid => False);
-            end if;
-            Val := Val * T (B);
          end loop;
          return Optional'(Valid => True, Value => Val);
       end Value;
 
       function Value (S : String) return Optional
       is
-         Ada_Base       : Boolean  := False;
-         Ada_Base_Begin : Positive := Positive'Last;
-         Ada_Base_Opt   : Optional := Optional'(Valid => False);
+         N_Base : Base_Number;
       begin
          if S'Length < 3 then
             return Value (S, 10);
          end if;
-         if S (S'First .. S'First + 1) = "0x" then -- C base 16
-            return Value (S (S'First + 2 .. S'Last), 16);
-         elsif S (S'First .. S'First + 1) = "0o" then -- C base 8
-            return Value (S (S'First + 2 .. S'Last), 8);
-         elsif S (S'First .. S'First + 1) = "0b" then -- C base 2
-            return Value (S (S'First + 2 .. S'Last), 2);
-         else
-            for I in S'Range loop
-               if
-                  S (I) = '#'
-                  and then I > S'First
-                  and then S (S'Last) = '#'
-                  and then I < S'Last - 1
-               then
-                  Ada_Base := True;
-                  Ada_Base_Begin := I;
-                  exit;
-               end if;
-            end loop;
-            if Ada_Base then
-               Ada_Base_Opt := Value (S (S'First .. Ada_Base_Begin - 1), 10);
-            end if;
-            if
-               Ada_Base_Opt.Valid
-               and then Ada_Base_Opt.Value in T (Base'First) .. T (Base'Last)
-            then
-               return Value (S (Ada_Base_Begin + 1 .. S'Last - 1), Base (Ada_Base_Opt.Value));
-            else
-               return Value (S, 10);
-            end if;
+         N_Base := Value_Base (S);
+         if N_Base.Valid then
+            return Value (S (N_Base.First .. N_Base.Last), N_Base.N_Base);
          end if;
+         return Optional'(Valid => False);
       end Value;
 
    end Value_Option_Modular;
+
+   package body Value_Option_Ranged
+   is
+      function Char_Value is new Character_Value (T'Base);
+
+      function Value (S : String;
+                      B : Base) return Optional
+      is
+         C_Val      : T'Base;
+         Val        : T'Base  := 0;
+         Underscore : Boolean := True;
+      begin
+         if S'Length < 1 or else S (S'Last) = '_' then
+            return Optional'(Valid => False);
+         end if;
+         for I in S'Range loop
+            pragma Loop_Invariant (Val >= 0);
+            if S (I) = '_' and then not Underscore then
+               Underscore := True;
+            else
+               Underscore := False;
+               if
+                  S (I) not in '0' .. (if B <= 10 then Lowercase (Residue_Class_Ring (B) - 1) else '9')
+                  and then (if B > 10 then S (I) not in 'a' .. Lowercase (Residue_Class_Ring (B) - 1)
+                                                      | 'A' .. Uppercase (Residue_Class_Ring (B) - 1))
+               then
+                  return Optional'(Valid => False);
+               end if;
+               C_Val := Char_Value (S (I));
+               if Val > T'Last - C_Val then
+                  return Optional'(Valid => False);
+               end if;
+               Val := Val + C_Val;
+               exit when I = S'Last;
+               if Val > T'Last / T'Base (B) then
+                  return Optional'(Valid => False);
+               end if;
+               Val := Val * T'Base (B);
+            end if;
+         end loop;
+         if Val in T'Range then
+            return Optional'(Valid => True, Value => Val);
+         else
+            return Optional'(Valid => False);
+         end if;
+      end Value;
+
+      function Value (S : String) return Optional
+      is
+         N_Base : Base_Number;
+      begin
+         if S'Length < 3 then
+            return Value (S, 10);
+         end if;
+         N_Base := Value_Base (S);
+         if N_Base.Valid then
+            return Value (S (N_Base.First .. N_Base.Last), N_Base.N_Base);
+         end if;
+         return Optional'(Valid => False);
+      end Value;
+
+   end Value_Option_Ranged;
 
 end Basalt.Strings_Generic;

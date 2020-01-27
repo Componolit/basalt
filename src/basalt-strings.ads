@@ -45,4 +45,9 @@ is
    package Value_U32 is new Strings_Generic.Value_Option_Modular (Interfaces.Unsigned_32);
    package Value_U64 is new Strings_Generic.Value_Option_Modular (Interfaces.Unsigned_64);
 
+   package Value_Integer is new Strings_Generic.Value_Option_Ranged (Integer);
+   package Value_Long_Integer is new Strings_Generic.Value_Option_Ranged (Long_Integer);
+   package Value_Natural is new Strings_Generic.Value_Option_Ranged (Natural);
+   package Value_Positive is new Strings_Generic.Value_Option_Ranged (Positive);
+
 end Basalt.Strings;

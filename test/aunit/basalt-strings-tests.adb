@@ -1,6 +1,7 @@
 
 with Aunit.Assertions;
 with Interfaces;
+with Basalt.Strings_Generic;
 
 package body Basalt.Strings.Tests
 is
@@ -135,6 +136,7 @@ is
       Aunit.Assertions.Assert (not Value_U32.Value ("4294967296").Valid, "Invalid True: 4294967296");
       Aunit.Assertions.Assert (not Value_U32.Value ("blubb").Valid, "Invalid True: blubb");
       Aunit.Assertions.Assert (not Value_U32.Value ("10#-1#").Valid, "Invalid True: 10#-1#");
+      Aunit.Assertions.Assert (not Value_U32.Value ("16#abc").Valid, "Invalid True: 16#abc");
       Aunit.Assertions.Assert (Value_U32.Value ("2147483647").Value'Img, " 2147483647", "Invalid Value");
       Aunit.Assertions.Assert (Value_U32.Value ("0x7fffffff").Value'Img, " 2147483647", "Invalid C Hex Value");
       Aunit.Assertions.Assert (Value_U32.Value ("0x7FFFFFFF").Value'Img, " 2147483647", "Invalid C Hex Value (Upper)");
@@ -153,6 +155,76 @@ is
       Aunit.Assertions.Assert (Value_U64.Value ("2844674779565").Value'Img, " 2844674779565", "Invalid Value");
    end Test_Value_Modular_64;
 
+   procedure Test_Value_Ranged_Int (T : in out Aunit.Test_Cases.Test_Case'Class)
+   is
+      pragma Unreferenced (T);
+   begin
+      Aunit.Assertions.Assert (not Value_Integer.Value ("-1").Valid, "Invalid True: -1");
+      Aunit.Assertions.Assert (not Value_Integer.Value ("v349").Valid, "Invalid True: v349");
+      Aunit.Assertions.Assert (not Value_Integer.Value ("2147483648").Valid, "Invalid True: 2147483648");
+      Aunit.Assertions.Assert (not Value_Integer.Value ("16#abc").Valid, "Invalid True: 16#abc");
+      Aunit.Assertions.Assert (not Value_Long_Integer.Value ("18446744073709551616").Valid, "Invalid True: 18446744073709551616");
+      Aunit.Assertions.Assert (Value_Integer.Value ("349").Value'Img, " 349", "Invalid Value");
+      Aunit.Assertions.Assert (Value_Integer.Value ("0").Value'Img, " 0", "Invalid Value");
+      Aunit.Assertions.Assert (Value_Integer.Value ("2147483647").Value'Img, " 2147483647", "Invalid Value");
+      Aunit.Assertions.Assert (Value_Long_Integer.Value ("0").Value'Img, " 0", "Invalid Value");
+      Aunit.Assertions.Assert (Value_Long_Integer.Value ("2147483648").Value'Img, " 2147483648", "Invalid Value");
+      Aunit.Assertions.Assert (Value_Long_Integer.Value ("9223372036854775807").Value'Img, " 9223372036854775807", "Invalid Value");
+      Aunit.Assertions.Assert (Value_Long_Integer.Value ("0x1234567890abcdef").Value'Img, " 1311768467294899695", "Invalid C Hex Value");
+      Aunit.Assertions.Assert (Value_Long_Integer.Value ("16#1234567890ABCDEF#").Value'Img, " 1311768467294899695", "Invalid Ada Hex Value");
+   end Test_Value_Ranged_Int;
+
+   procedure Test_Value_Ranged_Ranges (T : in out Aunit.Test_Cases.Test_Case'Class)
+   is
+      pragma Unreferenced (T);
+      type Test_Range is range 42 .. 69;
+      package Test_Value is new Strings_Generic.Value_Option_Ranged (Test_Range);
+   begin
+      Aunit.Assertions.Assert (not Value_Natural.Value ("-1").Valid, "Invalid True: -1");
+      Aunit.Assertions.Assert (not Value_Positive.Value ("0").Valid, "Invalid True: 0");
+      Aunit.Assertions.Assert (Value_Natural.Value ("0").Value'Img, " 0", "Invalid Value");
+      Aunit.Assertions.Assert (Value_Positive.Value ("1").Value'Img, " 1", "Invalid Value");
+      Aunit.Assertions.Assert (not Test_Value.Value ("41").Valid, "Invalid True: 41");
+      Aunit.Assertions.Assert (not Test_Value.Value ("70").Valid, "Invalid True: 70");
+      Aunit.Assertions.Assert (Test_Value.Value ("42").Value'Img, " 42", "Invalid Value");
+      Aunit.Assertions.Assert (Test_Value.Value ("56").Value'Img, " 56", "Invalid Value");
+      Aunit.Assertions.Assert (Test_Value.Value ("69").Value'Img, " 69", "Invalid Value");
+      Aunit.Assertions.Assert (Test_Value.Value ("0x33").Value'Img, " 51", "Invalid C Hex Value");
+      Aunit.Assertions.Assert (Test_Value.Value ("16#33#").Value'Img, " 51", "Invalid Ada Hex Value");
+   end Test_Value_Ranged_Ranges;
+
+   procedure Test_Value_Formats (T : in out Aunit.Test_Cases.Test_Case'Class)
+   is
+      pragma Unreferenced (T);
+   begin
+      Aunit.Assertions.Assert (not Value_U8.Value ("#123#").Valid, "Invalid Format: #123#");
+      Aunit.Assertions.Assert (not Value_U8.Value ("1#123#").Valid, "Invalid Format: 1#123#");
+      Aunit.Assertions.Assert (not Value_U8.Value ("10#123").Valid, "Invalid Format: 10#123");
+      Aunit.Assertions.Assert (not Value_U8.Value ("11##123#").Valid, "Invalid Format: 11##123#");
+      Aunit.Assertions.Assert (not Value_U8.Value ("123__123").Valid, "Invalid Format: 123__123");
+      Aunit.Assertions.Assert (not Value_U8.Value ("16#_C#").Valid, "Invalid Format: 16#_C#");
+      Aunit.Assertions.Assert (not Value_U8.Value ("16#C_#").Valid, "Invalid Format: 16#C_#");
+      Aunit.Assertions.Assert (not Value_U8.Value ("_42").Valid, "Invalid Format: _42");
+      Aunit.Assertions.Assert (not Value_U8.Value ("42_").Valid, "Invalid Format: 42_");
+      Aunit.Assertions.Assert (not Value_U8.Value ("4__2").Valid, "Invalid Format: 4__2");
+      Aunit.Assertions.Assert (Value_U32.Value ("16#abab_cdcd#").Value'Img, " 2880163277", "Invalid Value");
+      Aunit.Assertions.Assert (Value_U8.Value ("16#C_C#").Value'Img, " 204", "Invalid Value");
+      Aunit.Assertions.Assert (Value_U8.Value ("4_2").Value'Img, " 42", "Invalid Value");
+      Aunit.Assertions.Assert (not Value_Integer.Value ("#123#").Valid, "Invalid Format: #123#");
+      Aunit.Assertions.Assert (not Value_Integer.Value ("1#123#").Valid, "Invalid Format: 1#123#");
+      Aunit.Assertions.Assert (not Value_Integer.Value ("10#123").Valid, "Invalid Format: 10#123");
+      Aunit.Assertions.Assert (not Value_Integer.Value ("11##123#").Valid, "Invalid Format: 11##123#");
+      Aunit.Assertions.Assert (not Value_Integer.Value ("123__123").Valid, "Invalid Format: 123__123");
+      Aunit.Assertions.Assert (not Value_Integer.Value ("16#_C#").Valid, "Invalid Format: 16#_C#");
+      Aunit.Assertions.Assert (not Value_Integer.Value ("16#C_#").Valid, "Invalid Format: 16#C_#");
+      Aunit.Assertions.Assert (not Value_Integer.Value ("_42").Valid, "Invalid Format: _42");
+      Aunit.Assertions.Assert (not Value_Integer.Value ("42_").Valid, "Invalid Format: 42_");
+      Aunit.Assertions.Assert (not Value_Integer.Value ("4__2").Valid, "Invalid Format: 4__2");
+      Aunit.Assertions.Assert (Value_Integer.Value ("16#1234_cdcd#").Value'Img, " 305450445", "Invalid Value");
+      Aunit.Assertions.Assert (Value_Integer.Value ("16#C_C#").Value'Img, " 204", "Invalid Value");
+      Aunit.Assertions.Assert (Value_Integer.Value ("4_2").Value'Img, " 42", "Invalid Value");
+   end Test_Value_Formats;
+
    procedure Register_Tests (T : in out Test_Case)
    is
       use Aunit.Test_Cases.Registration;
@@ -169,6 +241,9 @@ is
       Register_Routine (T, Test_Value_Modular_8'Access, "Test Value Unsigned_8");
       Register_Routine (T, Test_Value_Modular_32'Access, "Test Value Unsigned_32");
       Register_Routine (T, Test_Value_Modular_64'Access, "Test Value Unsigned_64");
+      Register_Routine (T, Test_Value_Ranged_Int'Access, "Test Value Integers");
+      Register_Routine (T, Test_Value_Ranged_Ranges'Access, "Test Value Ranges");
+      Register_Routine (T, Test_Value_Formats'Access, "Test Value Formats");
    end Register_Tests;
 
    function Name (T : Test_Case) return Aunit.Message_String
