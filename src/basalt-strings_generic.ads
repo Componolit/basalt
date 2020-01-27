@@ -101,4 +101,37 @@ is
 
    end Value_Option_Modular;
 
+   generic
+      type T is range <>;
+   package Value_Option_Ranged
+   is
+
+      package Optional_Pac is new Generic_Optional (T);
+      subtype Optional is Optional_Pac.Optional;
+
+      function Value (S : String;
+                      B : Base) return Optional;
+
+      function Value (S : String) return Optional;
+
+   end Value_Option_Ranged;
+
+private
+
+   type Base_Number (Valid : Boolean := False) is record
+      case Valid is
+         when True =>
+            N_Base : Base;
+            First  : Positive;
+            Last   : Positive;
+         when False =>
+            null;
+      end case;
+   end record;
+
+   function Value_Base (S : String) return Base_Number with
+      Pre  => S'Length > 2,
+      Post => (if Value_Base'Result.Valid then Value_Base'Result.First in S'Range
+                                               and then Value_Base'Result.Last in S'Range);
+
 end Basalt.Strings_Generic;
