@@ -4,7 +4,7 @@ with Basalt.Queue;
 
 package body Queue_Tests
 is
-   package F is new Basalt.Queue (Integer);
+   package F is new Basalt.Queue (Integer, 0);
 
    procedure Test_Fifo (T : in out Aunit.Test_Cases.Test_Case'Class)
    is
@@ -12,7 +12,7 @@ is
       Q : F.Context (100);
       J : Integer;
    begin
-      F.Initialize (Q, 0);
+      F.Initialize (Q);
       for I in 70 .. 120 loop
          F.Put (Q, I);
       end loop;
@@ -27,7 +27,7 @@ is
       pragma Unreferenced (T);
       Q : F.Context (2);
    begin
-      F.Initialize (Q, 0);
+      F.Initialize (Q);
       Aunit.Assertions.Assert (F.Count (Q) = 0, "Count not 0");
       F.Put (Q, 1);
       Aunit.Assertions.Assert (F.Count (Q) = 1, "Count not 1 after Put");
@@ -45,7 +45,7 @@ is
       Q : F.Context (1);
       J : Integer;
    begin
-      F.Initialize (Q, 0);
+      F.Initialize (Q);
       Aunit.Assertions.Assert (F.Count (Q) = 0, "Queue not empty");
       F.Put (Q, 1);
       Aunit.Assertions.Assert (F.Count (Q) = 1, "Queue not full");
@@ -60,7 +60,7 @@ is
       pragma Unreferenced (T);
       Q : F.Context (100);
    begin
-      F.Initialize (Q, 0);
+      F.Initialize (Q);
       Aunit.Assertions.Assert (F.Count (Q) = 0, "Count should be 0");
       for I in Integer range 1 .. 20 loop
          F.Put (Q, I);
@@ -90,7 +90,7 @@ is
       Q      : F.Context (1);
       Unused : Integer;
    begin
-      F.Initialize (Q, 0);
+      F.Initialize (Q);
       Aunit.Assertions.Assert (F.Count (Q) = 0, "Count should be 0");
       F.Put (Q, 1);
       Aunit.Assertions.Assert (F.Count (Q) = 1, "Count should be 1");
@@ -118,7 +118,7 @@ is
          Aunit.Assertions.Assert (I = 42, "I should be 42");
       end Peek;
    begin
-      F.Initialize (Q, 0);
+      F.Initialize (Q);
       Aunit.Assertions.Assert (F.Count (Q) = 0, "Count should be 0");
       Put (Q);
       Aunit.Assertions.Assert (F.Count (Q) = 1, "Count should be 1");
@@ -136,10 +136,10 @@ is
       Q3 : F.Context (200);
       Q4 : F.Context (13000);
    begin
-      F.Initialize (Q1, 0);
-      F.Initialize (Q2, 0);
-      F.Initialize (Q3, 0);
-      F.Initialize (Q4, 0);
+      F.Initialize (Q1);
+      F.Initialize (Q2);
+      F.Initialize (Q3);
+      F.Initialize (Q4);
       Aunit.Assertions.Assert (F.Size (Q1) = 1, "Size of Q1 should be 1");
       Aunit.Assertions.Assert (F.Size (Q2) = 50, "Size of Q2 should be 50");
       Aunit.Assertions.Assert (F.Size (Q3) = 200, "Size of Q3 should be 200");
@@ -152,7 +152,7 @@ is
       Q : F.Context (10);
       J : Integer;
    begin
-      F.Initialize (Q, 0);
+      F.Initialize (Q);
       for I in Integer range 1 .. 7 loop
          F.Put (Q, I);
       end loop;

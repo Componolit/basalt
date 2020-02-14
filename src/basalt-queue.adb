@@ -20,17 +20,9 @@ is
    function Put_Index (C : Context) return Positive is
       (Positive ((C.Index + C.Length - 1) mod C.List'Length + Long_Positive (C.List'First)));
 
-   procedure Initialize (C            : out Context;
-                         Null_Element :     T)
+   procedure Initialize (C : in out Context)
    is
    begin
-      --  This would be the correct way to initialize S.List:
-      --     C.List  := (others => Null_Element);
-      --  As this creates a (potentially large) object on the stack, we initialize in a loop. The resulting flow
-      --  error is justified in the spec.
-      for E of C.List loop
-         E := Null_Element;
-      end loop;
       C.Length := Long_Natural'First;
       C.Index  := Long_Natural'First;
    end Initialize;
@@ -39,28 +31,28 @@ is
                   Element :        T)
    is
    begin
-      C.Length       := C.Length + 1;
-      C.List (Put_Index (C)) := Element;
+      C.Length                     := C.Length + 1;
+      C.List (Put_Index (C)).Value := Element;
    end Put;
 
    procedure Generic_Put (C : in out Context)
    is
    begin
-      C.Length       := C.Length + 1;
-      Put (C.List (Put_Index (C)));
+      C.Length := C.Length + 1;
+      Put (C.List (Put_Index (C)).Value);
    end Generic_Put;
 
    procedure Peek (C       :     Context;
                    Element : out T)
    is
    begin
-      Element := C.List (Positive (C.Index + Long_Positive (C.List'First)));
+      Element := C.List (Positive (C.Index + Long_Positive (C.List'First))).Value;
    end Peek;
 
    procedure Generic_Peek (C : Context)
    is
    begin
-      Peek (C.List (Positive (C.Index + Long_Positive (C.List'First))));
+      Peek (C.List (Positive (C.Index + Long_Positive (C.List'First))).Value);
    end Generic_Peek;
 
    procedure Drop (C : in out Context)

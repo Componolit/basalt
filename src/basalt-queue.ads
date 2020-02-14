@@ -14,6 +14,7 @@
 
 generic
    type T is private;
+   Null_Element : T;
 package Basalt.Queue with
    SPARK_Mode,
    Pure,
@@ -41,20 +42,11 @@ is
    --  @return   Number of elements currently in the queue
    function Count (C : Context) return Natural;
 
-   --  Initializes the queue with a default element value
+   --  Initializes the queue
    --
-   --  This procedure is only needed to proof the data flow. It is
-   --  the only way to assign a Queue object. The object will automatically
-   --  be initialized with the given element. The initialized queue will be empty.
-   --
-   --  @param C             Queue context
-   --  @param Null_Element  Default element to initialize the queue with
-   procedure Initialize (C            : out Context;
-                         Null_Element :     T) with
+   --  @param C  Queue context
+   procedure Initialize (C : in out Context) with
       Post => Count (C) = 0;
-   pragma Annotate (GNATprove, False_Positive,
-                    """C.List"" might not be initialized*",
-                    "Initialized in complete loop");
 
    --  Puts an element in the queue.
    --
@@ -115,7 +107,11 @@ is
 
 private
 
-   type Simple_List is array (Natural range <>) of T;
+   type List_Element is record
+      Value : T := Null_Element;
+   end record;
+
+   type Simple_List is array (Natural range <>) of List_Element;
    subtype Long_Natural is Long_Integer range 0 .. Long_Integer'Last;
    subtype Long_Positive is Long_Integer range 1 .. Long_Integer'Last;
 
