@@ -34,8 +34,8 @@ is
    procedure Push (S : in out Context;
                    E :        Element_Type) is
    begin
-      S.Index := S.Index + 1;
-      S.List (S.Index) := E;
+      S.Index                := S.Index + 1;
+      S.List (S.Index).Value := E;
    end Push;
 
    ------------------
@@ -46,7 +46,7 @@ is
    is
    begin
       S.Index := S.Index + 1;
-      Push (S.List (S.Index));
+      Push (S.List (S.Index).Value);
    end Generic_Push;
 
    ---------
@@ -56,7 +56,7 @@ is
    procedure Pop (S : in out Context;
                   E :    out Element_Type) is
    begin
-      E := S.List (S.Index);
+      E := S.List (S.Index).Value;
       Drop (S);
    end Pop;
 
@@ -67,7 +67,7 @@ is
    procedure Generic_Pop (S : in out Context)
    is
    begin
-      Pop (S.List (S.Index));
+      Pop (S.List (S.Index).Value);
       Drop (S);
    end Generic_Pop;
 
@@ -93,19 +93,10 @@ is
    -- Initialize --
    ----------------
 
-   procedure Initialize (S            : out Context;
-                         Null_Element :     Element_Type)
+   procedure Initialize (S : in out Context)
    is
    begin
       S.Index := 0;
-      --  This would be the correct way to initialize S.List:
-      --     S.List  := (others => Null_Element);
-      --  As this creates a (potentially large) object on the stack, we initialize in a loop. The resulting flow
-      --  error is justified in the spec.
-      for E of S.List loop
-         pragma Loop_Invariant (S.Index = 0);
-         E := Null_Element;
-      end loop;
    end Initialize;
 
 end Basalt.Stack;

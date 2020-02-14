@@ -5,7 +5,7 @@ package body Proof_Stack with
    SPARK_Mode
 is
 
-   package Stack is new Basalt.Stack (Integer);
+   package Stack is new Basalt.Stack (Integer, 0);
    S : Stack.Context (10);
 
    procedure Prove
@@ -26,7 +26,7 @@ is
          J_Ignore := I;
       end Pop;
    begin
-      Stack.Initialize (S, 0);
+      Stack.Initialize (S);
       for I in Integer range 7 .. 13 loop
          Stack.Push (S, I);
          exit when Stack.Count (S) >= Stack.Size (S);

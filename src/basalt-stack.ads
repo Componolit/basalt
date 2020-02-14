@@ -11,6 +11,7 @@
 
 generic
    type Element_Type is private;
+   Null_Element : Element_Type;
 package Basalt.Stack with
    SPARK_Mode,
    Pure,
@@ -106,21 +107,20 @@ is
    --  Initialize stack and clear stack buffer
    --
    --  @param S  Stack
-   procedure Initialize (S            : out Context;
-                         Null_Element :     Element_Type) with
+   procedure Initialize (S : in out Context) with
      Post => Is_Empty (S)
              and then not Is_Full (S);
 
-   pragma Annotate (GNATprove, False_Positive,
-                    """S.List"" might not be initialized*",
-                    "Initialized in complete loop");
-
 private
 
-   type Simple_List is array (Positive range <>) of Element_Type;
+   type List_Element is record
+      Value : Element_Type := Null_Element;
+   end record;
+
+   type Simple_List is array (Positive range <>) of List_Element;
 
    type Context (Size : Positive) is record
-      Index : Natural;
+      Index : Natural := 0;
       List  : Simple_List (1 .. Size);
    end record with
      Predicate => Index <= List'Last;
