@@ -10,6 +10,9 @@ Furthermore some useful functional properties have been formally verified.
 - [Basalt.Queue](src/basalt-queue.ads) - A FIFO queue implementation.
   The interface is designed in a way that allows to prove properties about the
   quantity of elements in the queue.
+- [Basalt.Stack](src/basalt-stack.ads) - A stack implementation.
+  The interface is designed in a way that allows to prove properties about the
+  quantity of elements on the stack.
 - [Basalt.Slicer](src/basalt-slicer.ads) - A tool that splits ranges into
   maximum sized slices. Each slice proves to be in the initially given range
   and to be at maximum of the given size.
