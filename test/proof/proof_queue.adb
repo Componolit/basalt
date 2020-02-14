@@ -5,7 +5,7 @@ package body Proof_Queue with
    SPARK_Mode
 is
 
-   package Fifo is new Basalt.Queue (Integer);
+   package Fifo is new Basalt.Queue (Integer, 0);
    Queue : Fifo.Context (10);
 
    procedure Prove
@@ -27,7 +27,7 @@ is
          J_Ignore := I;
       end Peek;
    begin
-      Fifo.Initialize (Queue, 0);
+      Fifo.Initialize (Queue);
       for I in Integer range 7 .. 13 loop
          Fifo.Put (Queue, I);
          exit when Fifo.Count (Queue) >= Fifo.Size (Queue);
