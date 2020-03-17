@@ -20,9 +20,22 @@ is
 
    generic
       type T is (<>);
-   function Character_Value (C : Character) return T with
-      Pre  => C in '0' .. '9' | 'a' .. 'f' | 'A' .. 'F',
-      Post => T'Pos (Character_Value'Result) >= 0;
+   package Char is
+
+      type Optional (Valid : Boolean := False) is record
+         case Valid is
+            when True =>
+               Value : T;
+            when False =>
+               null;
+         end case;
+      end record;
+
+      function Value (C : Character) return Optional with
+         Pre  => C in '0' .. '9' | 'a' .. 'f' | 'A' .. 'F',
+         Post => Value'Result.Valid and then T'Pos (Value'Result.Value) >= 0;
+
+   end Char;
 
    function Digit (U : SI.Unsigned_8;
                    C : Boolean) return Character
@@ -86,26 +99,31 @@ is
       return Image;
    end Image_Modular;
 
-   function Character_Value (C : Character) return T
-   is
-      pragma Compile_Time_Error (T'Pos (T'First) > 0 and then T'Pos (T'Last) < 16,
-                                 "Type must contain positions 0 - 16");
-   begin
-      case C is
-         when '0' .. '9' =>
-            return T'Val (Character'Pos (C) - 48);
-         when 'a' .. 'f' =>
-            return T'Val (Character'Pos (C) - 87);
-         when 'A' .. 'F' =>
-            return T'Val (Character'Pos (C) - 55);
-         when others =>
-            raise Constraint_Error;
-      end case;
-   end Character_Value;
+
+   package body Char is
+
+      function Value (C : Character) return Optional
+      is
+         pragma Compile_Time_Error (T'Pos (T'First) > 0 and then T'Pos (T'Last) < 16,
+                                    "Type must contain positions 0 - 16");
+      begin
+         case C is
+            when '0' .. '9' =>
+               return Optional'(Valid => True, Value => T'Val (Character'Pos (C) - 48));
+            when 'a' .. 'f' =>
+               return Optional'(Valid => True, Value => T'Val (Character'Pos (C) - 87));
+            when 'A' .. 'F' =>
+               return Optional'(Valid => True, Value => T'Val (Character'Pos (C) - 55));
+            when others =>
+               return Optional'(Valid => False);
+         end case;
+      end Value;
+
+   end Char;
 
    function Value_Base (S : String) return Base_Number
    is
-      function Base_Val is new Character_Value (Residue_Class_Ring);
+      package Base_Val is new Char (Residue_Class_Ring);
       Ada_Base  : Residue_Class_Ring;
       Base_Char : Residue_Class_Ring;
    begin
@@ -123,13 +141,13 @@ is
          if S (S'First) not in '0' .. '9' then
             return Base_Number'(Valid => False);
          end if;
-         Ada_Base := Base_Val (S (S'First));
+         Ada_Base := Base_Val.Value (S (S'First)).Value;
          case S (S'First + 1) is
             when '0' .. '9' =>
                if Ada_Base > 1 then
                   return Base_Number'(Valid => False);
                end if;
-               Base_Char := Base_Val (S (S'First + 1));
+               Base_Char := Base_Val.Value (S (S'First + 1)).Value;
                if Base_Char < 7 then
                   Ada_Base := Ada_Base * 10 + Base_Char;
                else
@@ -152,7 +170,7 @@ is
 
    package body Value_Option_Modular
    is
-      function Char_Value is new Character_Value (T);
+      package Char_Value is new Char (T);
 
       function Value (S : String;
                       B : Base) return Optional
@@ -176,7 +194,7 @@ is
                then
                   return Optional'(Valid => False);
                end if;
-               C_Val := Char_Value (S (I));
+               C_Val := Char_Value.Value (S (I)).Value;
                if Val > T'Last - C_Val then
                   return Optional'(Valid => False);
                end if;
@@ -209,7 +227,7 @@ is
 
    package body Value_Option_Ranged
    is
-      function Char_Value is new Character_Value (T'Base);
+      package Char_Value is new Char (T'Base);
 
       function Value (S : String;
                       B : Base) return Optional
@@ -234,7 +252,7 @@ is
                then
                   return Optional'(Valid => False);
                end if;
-               C_Val := Char_Value (S (I));
+               C_Val := Char_Value.Value (S (I)).Value;
                if Val > T'Last - C_Val then
                   return Optional'(Valid => False);
                end if;
