@@ -99,7 +99,6 @@ is
       return Image;
    end Image_Modular;
 
-
    package body Char is
 
       function Value (C : Character) return Optional
