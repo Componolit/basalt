@@ -1,8 +1,12 @@
 
+with "switches.gpr";
+
 library project Basalt is
 
    type Library_Type is ("dynamic", "static");
-   Kind : Library_Type := external ("KIND", "dynamic");
+   type Build_Type is ("default", "test");
+   Kind  : Library_Type := external ("KIND", "dynamic");
+   Build : Build_Type   := external ("BUILD", "default");
 
    for Create_Missing_Dirs use "True";
    for Source_Dirs use ("src");
@@ -13,12 +17,21 @@ library project Basalt is
    for Library_Dir use "lib";
    for Library_Kind use Kind;
 
+   package Builder is
+      case Build is
+         when "default" =>
+            for Global_Configuration_Pragmas use "restrictions.adc";
+         when "test" =>
+            for Global_Configuration_Pragmas use "test_restrictions.adc";
+      end case;
+   end Builder;
+
    package Compiler is
       case Kind is
          when "dynamic" =>
-            null;
+            for Default_Switches ("Ada") use Switches.Compiler_Switches;
          when "static" =>
-            for Default_Switches ("Ada") use ("-fPIC");
+            for Default_Switches ("Ada") use ("-fPIC") & Switches.Compiler_Switches;
       end case;
    end Compiler;
 
