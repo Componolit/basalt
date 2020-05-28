@@ -44,7 +44,7 @@ is
    function Create (Range_First  : Index;
                     Range_Last   : Index;
                     Slice_Length : Index) return Context with
-      Pre  => Range_First < Range_Last
+      Pre  => Range_First <= Range_Last
               and then Slice_Length > 0,
       Post => Get_Range (Create'Result).First = Range_First
               and then Get_Range (Create'Result).Last = Range_Last
