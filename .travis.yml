@@ -5,8 +5,13 @@ language: c
 services:
     - docker
 
+env:
+    - TEST_SUITE=gnat_community_2019
+    - TEST_SUITE=gnat_community_2020
+
 script:
-    - docker run -v $PWD:/basalt -t jklmnn/componolit-ci:latest-gnat /bin/sh -c "gprbuild -P /basalt/basalt.gpr && gprclean -P /basalt/basalt.gpr && gprbuild -P /basalt/test/aunit/test.gpr -XBUILD=test && /basalt/test/aunit/obj/test && gnatprove -P /basalt/test/proof/proof.gpr --level=2 --report=all --checks-as-errors"
+    - if [ "$TEST_SUITE" = "gnat_community_2019" ]; then docker run -v $PWD:/basalt -t componolit/ci:gnat-community-2019 /bin/sh -c "gprbuild -P /basalt/basalt.gpr && gprclean -P /basalt/basalt.gpr && gprbuild -P /basalt/test/aunit/test.gpr -XBUILD=test && /basalt/test/aunit/obj/test && gnatprove -P /basalt/test/proof/proof.gpr --level=2 --report=all --checks-as-errors"; fi
+    - if [ "$TEST_SUITE" = "gnat_community_2020" ]; then docker run -v $PWD:/basalt -t componolit/ci:gnat-community-2020 /bin/sh -c "gprbuild -P /basalt/basalt.gpr && gprclean -P /basalt/basalt.gpr && gprbuild -P /basalt/test/aunit/test.gpr -XBUILD=test && /basalt/test/aunit/obj/test && gnatprove -P /basalt/test/proof/proof.gpr --level=2 --report=all --checks-as-errors"; fi
 
 after_script:
    - cat test/proof/obj/gnatprove/gnatprove.out
