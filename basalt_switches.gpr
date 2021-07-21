@@ -1,4 +1,4 @@
-abstract project Switches
+abstract project Basalt_Switches
 is
    Compiler_Switches :=
    (
@@ -60,4 +60,4 @@ is
      ,"-O0"                -- Debug symbols
    );
 
-end Switches;
+end Basalt_Switches;

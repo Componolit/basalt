@@ -1,4 +1,3 @@
-
 project Proof is
 
    for Create_Missing_Dirs use "True";
