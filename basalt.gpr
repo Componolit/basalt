@@ -1,5 +1,4 @@
-
-with "switches.gpr";
+with "basalt_switches.gpr";
 
 library project Basalt is
 
@@ -29,9 +28,9 @@ library project Basalt is
    package Compiler is
       case Kind is
          when "dynamic" =>
-            for Default_Switches ("Ada") use Switches.Compiler_Switches;
+            for Default_Switches ("Ada") use Basalt_Switches.Compiler_Switches;
          when "static" =>
-            for Default_Switches ("Ada") use ("-fPIC") & Switches.Compiler_Switches;
+            for Default_Switches ("Ada") use ("-fPIC") & Basalt_Switches.Compiler_Switches;
       end case;
    end Compiler;
 
