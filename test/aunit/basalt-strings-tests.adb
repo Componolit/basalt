@@ -225,6 +225,55 @@ is
       Aunit.Assertions.Assert (Value_Integer.Value ("4_2").Value'Img, " 42", "Invalid Value");
    end Test_Value_Formats;
 
+   procedure Test_Split (T : in out Aunit.Test_Cases.Test_Case'Class)
+   is
+      pragma Unreferenced (T);
+      Empty : constant String (1 .. 0) := (others => Character'First);
+      Head  : String_Slice;
+      Tail  : String_Slice;
+      Non_Standard_Range : constant String (42 .. 50) := ("abcd efgh");
+   begin
+      Split ("123,123", ',', Head, Tail);
+      AUnit.Assertions.Assert (Head.Valid, "Head not valid");
+      AUnit.Assertions.Assert (Head.First'Img, " 1", "Invalid Head.First");
+      AUnit.Assertions.Assert (Head.Last'Img, " 3", "Invalid Head.Last");
+      AUnit.Assertions.Assert (Tail.Valid, "Tail not Valid");
+      AUnit.Assertions.Assert (Tail.First'Img, " 5", "Invalid Tail.First");
+      AUnit.Assertions.Assert (Tail.Last'Img, " 7", "Invalid Tail.Last");
+      Split ("123,123,,", ',', Head, Tail);
+      AUnit.Assertions.Assert (Head.Valid, "Head not valid");
+      AUnit.Assertions.Assert (Head.First'Img, " 1", "Invalid Head.First");
+      AUnit.Assertions.Assert (Head.Last'Img, " 3", "Invalid Head.Last");
+      AUnit.Assertions.Assert (Tail.Valid, "Tail not Valid");
+      AUnit.Assertions.Assert (Tail.First'Img, " 5", "Invalid Tail.First");
+      AUnit.Assertions.Assert (Tail.Last'Img, " 9", "Invalid Tail.Last");
+      Split (Empty, Character'First, Head, Tail);
+      AUnit.Assertions.Assert (not Head.Valid, "Head valid");
+      AUnit.Assertions.Assert (not Tail.Valid, "Tail valid");
+      Split ("123,", ',', Head, Tail);
+      AUnit.Assertions.Assert (Head.Valid, "Head not valid");
+      AUnit.Assertions.Assert (Head.First'Img, " 1", "Invalid Head.First");
+      AUnit.Assertions.Assert (Head.Last'Img, " 3", "Invalid Head.Last");
+      AUnit.Assertions.Assert (not Tail.Valid, "Tail valid");
+      Split ("123", ',', Head, Tail);
+      AUnit.Assertions.Assert (Head.Valid, "Head not valid");
+      AUnit.Assertions.Assert (Head.First'Img, " 1", "Invalid Head.First");
+      AUnit.Assertions.Assert (Head.Last'Img, " 3", "Invalid Head.Last");
+      AUnit.Assertions.Assert (not Tail.Valid, "Tail valid");
+      Split (",123,", ',', Head, Tail);
+      AUnit.Assertions.Assert (not Head.Valid, "Head valid");
+      AUnit.Assertions.Assert (Tail.Valid, "Tail not valid");
+      AUnit.Assertions.Assert (Tail.First'Img, " 2", "Invalid Tail.First");
+      AUnit.Assertions.Assert (Tail.Last'Img, " 5", "Invalid Tail.Last");
+      Split (Non_Standard_Range, ' ', Head, Tail);
+      AUnit.Assertions.Assert (Head.Valid, "Head not valid");
+      AUnit.Assertions.Assert (Head.First'Img, " 42", "Invalid Head.First");
+      AUnit.Assertions.Assert (Head.Last'Img, " 45", "Invalid Head.Last");
+      AUnit.Assertions.Assert (Tail.Valid, "Tail not Valid");
+      AUnit.Assertions.Assert (Tail.First'Img, " 47", "Invalid Tail.First");
+      AUnit.Assertions.Assert (Tail.Last'Img, " 50", "Invalid Tail.Last");
+   end Test_Split;
+
    procedure Register_Tests (T : in out Test_Case)
    is
       use Aunit.Test_Cases.Registration;
@@ -244,6 +293,7 @@ is
       Register_Routine (T, Test_Value_Ranged_Int'Access, "Test Value Integers");
       Register_Routine (T, Test_Value_Ranged_Ranges'Access, "Test Value Ranges");
       Register_Routine (T, Test_Value_Formats'Access, "Test Value Formats");
+      Register_Routine (T, Test_Split'Access, "Test Split");
    end Register_Tests;
 
    function Name (T : Test_Case) return Aunit.Message_String
