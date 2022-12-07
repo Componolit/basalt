@@ -20,7 +20,7 @@ generic
 package Basalt.Slicer with
    SPARK_Mode,
    Pure,
-   Annotate => (GNATprove, Terminating)
+   Annotate => (GNATprove, Always_Return)
 is
 
    --  Slicer context

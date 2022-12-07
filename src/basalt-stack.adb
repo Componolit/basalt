@@ -11,7 +11,7 @@
 
 package body Basalt.Stack
 is
-   pragma Annotate (GNATprove, Terminating, Basalt.Stack);
+   pragma Annotate (GNATprove, Always_Return, Basalt.Stack);
 
    ----------
    -- Size --

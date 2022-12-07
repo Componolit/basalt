@@ -15,7 +15,7 @@ with Basalt.Strings_Generic;
 package Basalt.Strings with
    SPARK_Mode,
    Pure,
-   Annotate => (GNATprove, Terminating)
+   Annotate => (GNATprove, Always_Return)
 is
 
    --  Image instances for the most common ranged and modular types

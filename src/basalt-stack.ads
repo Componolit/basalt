@@ -15,7 +15,7 @@ generic
 package Basalt.Stack with
    SPARK_Mode,
    Pure,
-   Annotate => (GNATprove, Terminating)
+   Annotate => (GNATprove, Always_Return)
 is
    pragma Unevaluated_Use_Of_Old (Allow);
 
