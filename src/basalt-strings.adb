@@ -72,4 +72,39 @@ is
       end;
    end Image;
 
+   procedure Split (Value     :     String;
+                    Delimiter :     Character;
+                    Head      : out String_Slice;
+                    Tail      : out String_Slice)
+   is
+   begin
+      Head := String_Slice'(Valid => False);
+      Tail := String_Slice'(Valid => False);
+      for I in Value'Range loop
+         if Value (I) = Delimiter then
+            if I > Value'First then
+               Head := String_Slice'(Valid => True,
+                                     First => Value'First,
+                                     Last  => I - 1);
+            end if;
+            if I < Value'Last then
+               Tail := String_Slice'(Valid => True,
+                                     First => I + 1,
+                                     Last  => Value'Last);
+            end if;
+            return;
+         end if;
+         pragma Loop_Invariant (not Head.Valid);
+         pragma Loop_Invariant (not Tail.Valid);
+         pragma Loop_Invariant (Delimiter /= Value (I));
+         pragma Loop_Invariant (for all J in Value'First .. I => Value (J) /= Delimiter);
+      end loop;
+      pragma Assert (for all I in Value'Range => Value (I) /= Delimiter);
+      if Value'Length > 0 then
+         Head := String_Slice'(Valid => True,
+                               First => Value'First,
+                               Last  => Value'Last);
+      end if;
+   end Split;
+
 end Basalt.Strings;
