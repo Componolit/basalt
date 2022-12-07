@@ -50,4 +50,30 @@ is
    package Value_Natural is new Strings_Generic.Value_Option_Ranged (Natural);
    package Value_Positive is new Strings_Generic.Value_Option_Ranged (Positive);
 
+   type String_Slice (Valid : Boolean := False) is record
+      case Valid is
+         when True =>
+            First : Natural;
+            Last  : Natural;
+         when False =>
+            null;
+      end case;
+   end record;
+
+   --  Split a string into a head and tail part based on a delimiting character
+   --
+   --  @param Value  String to split
+   --  @param Delimiter  Delimiting character
+   --  @param Head Range in Value before Delimiter, excluding Delimiter
+   --  @param Tail Range in Value after Delimiter, excluding first Delimiter
+   procedure Split (Value     :     String;
+                    Delimiter :     Character;
+                    Head      : out String_Slice;
+                    Tail      : out String_Slice) with
+      Pre  => not Head'Constrained and not Tail'Constrained,
+      Post => (Value'Length > 0 and then Delimiter /= Value (Value'First)) = Head.Valid
+              and then (for some I in Value'Range => Value (I) = Delimiter and then I /= Value'Last) = Tail.Valid
+              and then (if Tail.Valid then Tail.First in Value'Range and then Tail.Last in Value'Range)
+              and then (if Head.Valid then Head.First in Value'Range and then Head.Last in Value'Range);
+
 end Basalt.Strings;
