@@ -18,7 +18,7 @@ generic
 package Basalt.Queue with
    SPARK_Mode,
    Pure,
-   Annotate => (GNATprove, Terminating)
+   Annotate => (GNATprove, Always_Return)
 is
 
    --  Queue storage type
