@@ -99,4 +99,26 @@ is
       S.Index := 0;
    end Initialize;
 
+   --------------
+   -- Reversed --
+   --------------
+
+   procedure Reversed (S : in out Context)
+   is
+      Low  : Natural := S.List'First;
+      High : Natural := S.Index;
+      Swap : List_Element;
+   begin
+      while Low < High loop
+         pragma Loop_Invariant (Low in S.List'Range);
+         pragma Loop_Invariant (High in S.List'Range);
+         pragma Loop_Variant (Increases => Low, Decreases => High);
+         Swap          := S.List (Low);
+         S.List (Low)  := S.List (High);
+         S.List (High) := Swap;
+         Low  := Low + 1;
+         High := High - 1;
+      end loop;
+   end Reversed;
+
 end Basalt.Stack;

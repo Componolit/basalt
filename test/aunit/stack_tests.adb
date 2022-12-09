@@ -128,6 +128,32 @@ is
       Aunit.Assertions.Assert (F.Count (Q) = 0, "Count should be 0");
    end Test_Generic;
 
+   procedure Test_Reverse (T : in out Aunit.Test_Cases.Test_Case'Class)
+   is
+      pragma Unreferenced (T);
+      Q : F.Context (10);
+      E : Integer;
+   begin
+      F.Initialize (Q);
+      F.Push (Q, 2);
+      F.Push (Q, 4);
+      F.Push (Q, 6);
+      F.Push (Q, 8);
+      F.Push (Q, 10);
+      Aunit.Assertions.Assert (F.Count (Q)'Image, " 5", "Invalid count");
+      F.Reversed (Q);
+      Aunit.Assertions.Assert (F.Count (Q)'Image, " 5", "Invalid count");
+      F.Pop (Q, E);
+      Aunit.Assertions.Assert (E'Image, " 2", "Invalid element value");
+      F.Pop (Q, E);
+      Aunit.Assertions.Assert (E'Image, " 4", "Invalid element value");
+      F.Pop (Q, E);
+      Aunit.Assertions.Assert (E'Image, " 6", "Invalid element value");
+      F.Pop (Q, E);
+      Aunit.Assertions.Assert (E'Image, " 8", "Invalid element value");
+      F.Pop (Q, E);
+      Aunit.Assertions.Assert (E'Image, " 10", "Invalid element value");
+   end Test_Reverse;
 
    procedure Register_Tests (T : in out Test_Case)
    is
@@ -139,6 +165,7 @@ is
       Register_Routine (T, Test_Count'Access, "Test count");
       Register_Routine (T, Test_Size'Access, "Test size");
       Register_Routine (T, Test_Generic'Access, "Test generic");
+      Register_Routine (T, Test_Reverse'Access, "Test reverse");
    end Register_Tests;
 
    function Name (T : Test_Case) return Aunit.Message_String
