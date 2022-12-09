@@ -111,6 +111,15 @@ is
      Post => Is_Empty (S)
              and then not Is_Full (S);
 
+   --  Reverse the order of all elements on the stack
+   --
+   --  @param S  Stack
+   procedure Reversed (S : in out Context) with
+     Post => Is_Empty (S) = Is_Empty (S)'Old
+             and then Is_Full (S) = Is_Full (S)'Old
+             and then Count (S) = Count (S)'Old
+             and then Size (S) = Size (S)'Old;
+
 private
 
    type List_Element is record
